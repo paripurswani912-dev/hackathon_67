@@ -1,54 +1,78 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for
 from models.receipt import Receipt
 from models.delivery import Delivery
 from models.transfer import Transfer
 from models.adjustment import Adjustment
+from models.product import Product
 
 move_history_bp = Blueprint("move_history", __name__)
-@move_history_bp.route("/move-history", methods=["GET"])
+
+@move_history_bp.route("/history", methods=["GET"])
 def get_move_history():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
 
     history = []
 
-    # receipts
-    receipts = Receipt.query.all()
-    for r in receipts:
+    for r in Receipt.query.order_by(Receipt.id.desc()).all():
+        product = Product.query.get(r.product_id)
         history.append({
-            "type": "receipt",
-            "product_id": r.product_id,
-            "quantity": r.quantity,
-            "source": r.supplier
+            "datetime": "Recent",
+            "reference": f"REC-{r.id:04d}",
+            "type": "Receipt",
+            "product": product.name if product else "Unknown",
+            "from_location": r.supplier,
+            "to_location": "Main Warehouse",
+            "qty_change": r.quantity,
+            "user": "Admin"
         })
 
-    # deliveries
-    deliveries = Delivery.query.all()
-    for d in deliveries:
+    for d in Delivery.query.order_by(Delivery.id.desc()).all():
+        product = Product.query.get(d.product_id)
         history.append({
-            "type": "delivery",
-            "product_id": d.product_id,
-            "quantity": -d.quantity,
-            "source": d.customer
+            "datetime": "Recent",
+            "reference": f"DEL-{d.id:04d}",
+            "type": "Delivery",
+            "product": product.name if product else "Unknown",
+            "from_location": "Main Warehouse",
+            "to_location": d.customer,
+            "qty_change": -d.quantity,
+            "user": "Admin"
         })
 
-    # transfers
-    transfers = Transfer.query.all()
-    for t in transfers:
+    for t in Transfer.query.order_by(Transfer.id.desc()).all():
+        product = Product.query.get(t.product_id)
         history.append({
-            "type": "transfer",
-            "product_id": t.product_id,
-            "quantity": 0,
-            "from": t.from_location,
-            "to": t.to_location
+            "datetime": "Recent",
+            "reference": f"TRF-{t.id:04d}",
+            "type": "Transfer",
+            "product": product.name if product else "Unknown",
+            "from_location": t.from_location,
+            "to_location": t.to_location,
+            "qty_change": 0,
+            "user": "Admin"
         })
 
-    # adjustments
-    adjustments = Adjustment.query.all()
-    for a in adjustments:
+    for a in Adjustment.query.order_by(Adjustment.id.desc()).all():
+        product = Product.query.get(a.product_id)
         history.append({
-            "type": "adjustment",
-            "product_id": a.product_id,
-            "quantity_change": a.quantity_change,
-            "reason": a.reason
+            "datetime": "Recent",
+            "reference": f"ADJ-{a.id:04d}",
+            "type": "Adjustment",
+            "product": product.name if product else "Unknown",
+            "from_location": None,
+            "to_location": None,
+            "qty_change": a.quantity_change,
+            "user": "Admin"
         })
 
-    return jsonify(history)
+    return render_template("history.html",
+        active_page="history",
+        page_title="Move History",
+        current_user=type("User", (), {"username": session.get("username", "U")})(),
+        history=history,
+        receipt_count=Receipt.query.count(),
+        delivery_count=Delivery.query.count(),
+        transfer_count=Transfer.query.count(),
+        adjustment_count=Adjustment.query.count()
+    )

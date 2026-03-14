@@ -25,6 +25,8 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'koshex-secret-2026'
+app.config['SESSION_TYPE'] = 'filesystem'
 
 db.init_app(app)
 
@@ -39,7 +41,8 @@ app.register_blueprint(dashboard_bp)
 app.register_blueprint(move_history_bp)
 @app.route("/")
 def home():
-    return {"message": "CoreInventory Running"}
+    from flask import redirect
+    return redirect("/login")
 
 # Create tables
 with app.app_context():

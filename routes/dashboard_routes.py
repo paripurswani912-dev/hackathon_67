@@ -1,41 +1,73 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for
 from models.product import Product
 from models.receipt import Receipt
 from models.delivery import Delivery
 from models.transfer import Transfer
+from models.adjustment import Adjustment
 
 dashboard_bp = Blueprint("dashboard", __name__)
+
 @dashboard_bp.route("/dashboard", methods=["GET"])
 def get_dashboard_data():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
 
-    # total products
     total_products = Product.query.count()
-
-    # total stock quantity
-    total_stock = sum(p.stock for p in Product.query.all())
-
-    # low stock (example threshold = 10)
     low_stock = Product.query.filter(Product.stock < 10).count()
-
-    # out of stock
     out_of_stock = Product.query.filter(Product.stock == 0).count()
+    pending_receipts = Receipt.query.count()
+    pending_deliveries = Delivery.query.count()
 
-    # total receipts
-    total_receipts = Receipt.query.count()
+    recent_operations = []
 
-    # total deliveries
-    total_deliveries = Delivery.query.count()
+    for r in Receipt.query.order_by(Receipt.id.desc()).limit(5).all():
+        product = Product.query.get(r.product_id)
+        recent_operations.append({
+            "reference": f"REC-{r.id:04d}",
+            "type": "Receipt",
+            "product": product.name if product else "Unknown",
+            "qty": f"{r.quantity}",
+            "date": "Recent",
+            "status": "Done"
+        })
 
-    # total transfers
-    total_transfers = Transfer.query.count()
+    for d in Delivery.query.order_by(Delivery.id.desc()).limit(5).all():
+        product = Product.query.get(d.product_id)
+        recent_operations.append({
+            "reference": f"DEL-{d.id:04d}",
+            "type": "Delivery",
+            "product": product.name if product else "Unknown",
+            "qty": f"{d.quantity}",
+            "date": "Recent",
+            "status": "Done"
+        })
 
-    return jsonify({
-        "total_products": total_products,
-        "total_stock": total_stock,
-        "low_stock_items": low_stock,
-        "out_of_stock_items": out_of_stock,
-        "receipts": total_receipts,
-        "deliveries": total_deliveries,
-        "transfers": total_transfers
-    })
-    
+    low_stock_items = []
+    for p in Product.query.filter(Product.stock < 10).all():
+        low_stock_items.append({
+            "name": p.name,
+            "location": "Main Warehouse",
+            "qty": p.stock
+        })
+
+    recent_activity = []
+    for r in Receipt.query.order_by(Receipt.id.desc()).limit(3).all():
+        product = Product.query.get(r.product_id)
+        recent_activity.append({
+            "text": f"Receipt validated. Stock +{r.quantity} {product.name if product else ''}.",
+            "time": "Recent"
+        })
+
+    return render_template("dashboard.html",
+        active_page="dashboard",
+        page_title="Dashboard",
+        current_user=type("User", (), {"username": session.get("username", "U")})(),
+        total_products=total_products,
+        low_stock=low_stock,
+        out_of_stock=out_of_stock,
+        pending_receipts=pending_receipts,
+        pending_deliveries=pending_deliveries,
+        recent_operations=recent_operations,
+        low_stock_items=low_stock_items,
+        recent_activity=recent_activity
+    )

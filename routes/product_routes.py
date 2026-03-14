@@ -1,57 +1,62 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from database import db
 from models.product import Product
 
 product_bp = Blueprint("products", __name__)
-@product_bp.route("/products", methods=["POST"])
-def add_product():
-
-    data = request.get_json()
-
-    product = Product(
-        name=data.get("name"),
-        sku=data.get("sku"),
-        category=data.get("category"),
-        unit=data.get("unit"),
-        stock=data.get("stock", 0)
-    )
-
-    db.session.add(product)
-    db.session.commit()
-
-    return jsonify({"message": "Product added successfully"})
 
 @product_bp.route("/products", methods=["GET"])
 def list_products():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
 
     products = Product.query.all()
+    return render_template("products.html",
+        active_page="products",
+        page_title="Products",
+        current_user=type("User", (), {"username": session.get("username", "U")})(),
+        products=products
+    )
 
-    result = []
+@product_bp.route("/products/new", methods=["POST"])
+def add_product():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
 
-    for p in products:
-        result.append({
-            "id": p.id,
-            "name": p.name,
-            "sku": p.sku,
-            "category": p.category,
-            "unit": p.unit,
-            "stock": p.stock
-        })
+    name = request.form.get("name")
+    sku = request.form.get("sku")
+    category = request.form.get("category")
+    unit = request.form.get("unit")
+    stock = int(request.form.get("initial_stock") or 0)
+    location = request.form.get("location")
 
-    return jsonify(result)    
-@product_bp.route("/products/<int:id>", methods=["GET"])
-def view_product(id):
+    product = Product(
+        name=name,
+        sku=sku,
+        category=category,
+        unit=unit,
+        stock=stock
+    )
+    db.session.add(product)
+    db.session.commit()
+
+    flash("Product added successfully", "success")
+    return redirect(url_for("products.list_products"))
+
+@product_bp.route("/products/<int:id>/edit", methods=["GET"])
+def edit_product(id):
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
 
     product = Product.query.get(id)
-
     if not product:
-        return jsonify({"message": "Product not found"}), 404
+        flash("Product not found", "error")
+        return redirect(url_for("products.list_products"))
 
-    return jsonify({
-        "id": product.id,
-        "name": product.name,
-        "sku": product.sku,
-        "category": product.category,
-        "unit": product.unit,
-        "stock": product.stock
-    })    
+    products = Product.query.all()
+    return render_template("products.html",
+        active_page="products",
+        page_title="Products",
+        current_user=type("User", (), {"username": session.get("username", "U")})(),
+        products=products,
+        edit_product=product
+    )
