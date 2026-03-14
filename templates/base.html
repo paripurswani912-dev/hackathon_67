@@ -6,7 +6,7 @@
   <title>CoreInventory — {{ page_title }}</title>
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -262,7 +262,17 @@
 
   <!-- NAVBAR -->
   <nav class="topnav">
-    <a href="/dashboard" class="nav-logo">Core<span>Inventory</span></a>
+    <a href="/dashboard" class="nav-logo" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+  <svg width="24" height="24" viewBox="0 0 38 38" fill="none">
+    <polygon points="19,4 33,11 19,18 5,11" fill="#AFA9EC" opacity="0.25" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="5,11 19,18 19,34 5,27" fill="#AFA9EC" opacity="0.1" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="33,11 19,18 19,34 33,27" fill="#AFA9EC" opacity="0.18" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
+  </svg>
+  <div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:500; letter-spacing:-0.02em; color:white; line-height:1;">kosh<span style="color:#AFA9EC;">ex</span></div>
+    <div style="font-family:'DM Sans',sans-serif; font-size:7.5px; font-weight:300; letter-spacing:0.18em; text-transform:uppercase; color:rgba(175,169,236,0.5); margin-top:2px;">inventory intelligence</div>
+  </div>
+</a>
 
     <div class="nav-links">
       <a href="/dashboard"   class="nav-link {% if active_page == 'dashboard'   %}active{% endif %}">Dashboard</a>
