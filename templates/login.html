@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoreInventory — Login</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cream:        #F5F0E8;
+      --cream2:       #EDE8DF;
+      --cream3:       #E2DDD4;
+      --purple-dark:  #26215C;
+      --purple-mid:   #3C3489;
+      --purple-soft:  #AFA9EC;
+      --purple-light: #EEEDFE;
+      --charcoal:     #2C2C2A;
+      --gray:         #888780;
+      --red:          #A32D2D;
+      --red-light:    #FCEBEB;
+      --green:        #1D9E75;
+      --green-light:  #E1F5EE;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      background: var(--purple-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative circles */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      border: 1px solid rgba(175, 169, 236, 0.15);
+      top: -100px;
+      right: -100px;
+    }
+
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      border: 1px solid rgba(175, 169, 236, 0.1);
+      bottom: 80px;
+      left: -60px;
+    }
+
+    .left-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: 0.04em;
+    }
+
+    .left-logo span { color: var(--purple-soft); }
+
+    .left-content { z-index: 1; }
+
+    .left-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 38px;
+      font-weight: 400;
+      color: white;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+      margin-bottom: 16px;
+    }
+
+    .left-tagline em {
+      color: var(--purple-soft);
+      font-style: italic;
+    }
+
+    .left-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 320px;
+    }
+
+    .left-footer {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.05em;
+      z-index: 1;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+    }
+
+    .form-box {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .form-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--purple-dark);
+      margin-bottom: 6px;
+    }
+
+    .form-subheading {
+      font-size: 12px;
+      color: var(--gray);
+      font-weight: 300;
+      margin-bottom: 32px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--cream2);
+    }
+
+    .tab {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--gray);
+      padding: 8px 20px 10px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      color: var(--purple-mid);
+      font-weight: 500;
+      border-bottom-color: var(--purple-mid);
+    }
+
+    /* FORM FIELDS */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 0.5px solid var(--cream3);
+      border-radius: 6px;
+      background: white;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--charcoal);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field input:focus {
+      border-color: var(--purple-soft);
+    }
+
+    .field input::placeholder { color: var(--cream3); }
+
+    /* FORGOT PASSWORD */
+    .forgot {
+      text-align: right;
+      margin-top: -8px;
+      margin-bottom: 24px;
+    }
+
+    .forgot a {
+      font-size: 11px;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .forgot a:hover { color: var(--purple-mid); }
+
+    /* SUBMIT BUTTON */
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background: var(--purple-mid);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.15s;
+    }
+
+    .btn-submit:hover { background: var(--purple-dark); }
+
+    /* DIVIDER */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--cream2);
+    }
+
+    .divider span {
+      font-size: 11px;
+      color: var(--gray-light);
+    }
+
+    /* FLASH MESSAGES */
+    .flash-error {
+      background: var(--red-light);
+      color: var(--red);
+      border: 0.5px solid var(--red);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .flash-success {
+      background: var(--green-light);
+      color: var(--green);
+      border: 0.5px solid var(--green);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    /* TOGGLE FORMS */
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+  </style>
+</head>
+
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-logo">Core<span>Inventory</span></div>
+
+    <div class="left-content">
+      <div class="left-tagline">
+        Stock that's always<br><em>under control.</em>
+      </div>
+      <div class="left-sub">
+        A centralized system for managing receipts, deliveries, transfers and adjustments — all in one place.
+      </div>
+    </div>
+
+    <div class="left-footer">COREINVENTORY &nbsp;·&nbsp; HACKATHON 2026</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-box">
+
+      <div class="form-heading">Welcome back</div>
+      <div class="form-subheading">Sign in to your inventory workspace</div>
+
+      <!-- FLASH MESSAGES -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('login', this)">Sign In</div>
+        <div class="tab" onclick="switchTab('signup', this)">Sign Up</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form" class="form-section active">
+        <form method="POST" action="/login">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@company.com" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+          </div>
+          <div class="forgot">
+            <a href="/forgot-password">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div id="signup-form" class="form-section">
+        <form method="POST" action="/signup">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="username" placeholder="Your name" required>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@company.com" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn-submit">Create Account</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById(tab + '-form').classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Move History</div>
+    <div class="page-subtitle">Complete log of every stock movement</div>
+  </div>
+  <a href="/history/export" class="btn-ghost-custom">Export Log</a>
+</div>
+
+<!-- FILTER BAR -->
+<div class="card-custom" style="margin-bottom:16px;">
+  <div style="padding:12px 20px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <input
+      type="text"
+      placeholder="Search by product, reference or location..."
+      style="flex:1; min-width:200px; padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--charcoal);"
+    >
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Types</option>
+      <option>Receipt</option>
+      <option>Delivery</option>
+      <option>Transfer</option>
+      <option>Adjustment</option>
+    </select>
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Warehouses</option>
+      <option>Main Warehouse</option>
+      <option>Warehouse 2</option>
+      <option>Production Floor</option>
+    </select>
+    <input
+      type="date"
+      style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);"
+    >
+  </div>
+</div>
+
+<!-- SUMMARY STRIP -->
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;">
+
+  <div class="card-custom" style="padding:14px 18px; display:flex; align-items:center; gap:14px;">
+    <div style="width:36px; height:36px; border-radius:8px; background:var(--green-light); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">↑</div>
+    <div>
+      <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); font-weight:500;">Receipts</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--purple-dark);">{{ receipt_count or '—' }}</div>
+    </div>
+  </div>
+
+  <div class="card-custom" style="padding:14px 18px; display:flex; align-items:center; gap:14px;">
+    <div style="width:36px; height:36px; border-radius:8px; background:var(--red-light); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">↓</div>
+    <div>
+      <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); font-weight:500;">Deliveries</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--purple-dark);">{{ delivery_count or '—' }}</div>
+    </div>
+  </div>
+
+  <div class="card-custom" style="padding:14px 18px; display:flex; align-items:center; gap:14px;">
+    <div style="width:36px; height:36px; border-radius:8px; background:var(--purple-light); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">→</div>
+    <div>
+      <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); font-weight:500;">Transfers</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--purple-dark);">{{ transfer_count or '—' }}</div>
+    </div>
+  </div>
+
+  <div class="card-custom" style="padding:14px 18px; display:flex; align-items:center; gap:14px;">
+    <div style="width:36px; height:36px; border-radius:8px; background:var(--amber-light); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">≠</div>
+    <div>
+      <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); font-weight:500;">Adjustments</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--purple-dark);">{{ adjustment_count or '—' }}</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HISTORY TABLE -->
+<div class="card-custom">
+  <div class="card-head">
+    <div class="card-title">Stock Ledger</div>
+    <div style="font-size:11px; color:var(--gray);">{{ history|length if history else 0 }} entries</div>
+  </div>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Date & Time</th>
+        <th>Reference</th>
+        <th>Type</th>
+        <th>Product</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Qty Change</th>
+        <th>Done By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if history %}
+        {% for entry in history %}
+        <tr>
+          <td style="color:var(--gray); font-size:11px; white-space:nowrap;">{{ entry.datetime }}</td>
+          <td style="font-weight:500;">{{ entry.reference }}</td>
+          <td>
+            {% if entry.type == 'Receipt' %}
+              <span class="pill pill-ready">Receipt</span>
+            {% elif entry.type == 'Delivery' %}
+              <span class="pill pill-alert">Delivery</span>
+            {% elif entry.type == 'Transfer' %}
+              <span class="pill pill-done">Transfer</span>
+            {% elif entry.type == 'Adjustment' %}
+              <span class="pill pill-waiting">Adjustment</span>
+            {% endif %}
+          </td>
+          <td>{{ entry.product }}</td>
+          <td style="color:var(--gray);">{{ entry.from_location or '—' }}</td>
+          <td style="color:var(--gray);">{{ entry.to_location or '—' }}</td>
+          <td>
+            {% if entry.qty_change > 0 %}
+              <span style="color:var(--green); font-weight:500;">+{{ entry.qty_change }}</span>
+            {% elif entry.qty_change < 0 %}
+              <span style="color:var(--red); font-weight:500;">{{ entry.qty_change }}</span>
+            {% else %}
+              <span style="color:var(--gray);">0</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--gray);">{{ entry.user }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--gray-light); padding:48px;">
+            No stock movements logged yet
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

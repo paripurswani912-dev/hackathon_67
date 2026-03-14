@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Receipts</div>
+    <div class="page-subtitle">Incoming stock from vendors</div>
+  </div>
+  <a href="/receipts/new" class="btn-primary-custom">+ New Receipt</a>
+</div>
+
+<!-- FILTER BAR -->
+<div class="card-custom" style="margin-bottom:16px;">
+  <div style="padding:12px 20px; display:flex; gap:10px; align-items:center;">
+    <input
+      type="text"
+      placeholder="Search by reference or supplier..."
+      style="flex:1; padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--charcoal);"
+    >
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Statuses</option>
+      <option>Draft</option>
+      <option>Waiting</option>
+      <option>Ready</option>
+      <option>Done</option>
+      <option>Cancelled</option>
+    </select>
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Warehouses</option>
+      <option>Main Warehouse</option>
+      <option>Warehouse 2</option>
+      <option>Production Floor</option>
+    </select>
+  </div>
+</div>
+
+<!-- RECEIPTS TABLE -->
+<div class="card-custom" style="margin-bottom:20px;">
+  <div class="card-head">
+    <div class="card-title">All Receipts</div>
+    <div style="font-size:11px; color:var(--gray);">{{ receipts|length if receipts else 0 }} receipts</div>
+  </div>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Supplier</th>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Warehouse</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if receipts %}
+        {% for receipt in receipts %}
+        <tr>
+          <td style="font-weight:500;">{{ receipt.reference }}</td>
+          <td style="color:var(--gray);">{{ receipt.supplier }}</td>
+          <td>{{ receipt.product }}</td>
+          <td style="font-weight:500;">{{ receipt.qty }}</td>
+          <td style="color:var(--gray);">{{ receipt.warehouse }}</td>
+          <td style="color:var(--gray);">{{ receipt.date }}</td>
+          <td>
+            {% if receipt.status == 'Done' %}
+              <span class="pill pill-done">Done</span>
+            {% elif receipt.status == 'Ready' %}
+              <span class="pill pill-ready">Ready</span>
+            {% elif receipt.status == 'Waiting' %}
+              <span class="pill pill-waiting">Waiting</span>
+            {% else %}
+              <span class="pill pill-draft">Draft</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/receipts/{{ receipt.id }}"
+               style="font-size:11px; color:var(--purple-mid); text-decoration:none;">
+              View →
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--gray-light); padding:48px;">
+            No receipts yet — <a href="/receipts/new" style="color:var(--purple-mid); text-decoration:none;">create your first one</a>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- NEW RECEIPT FORM -->
+<div class="card-custom">
+  <div class="card-head">
+    <div class="card-title">Create New Receipt</div>
+  </div>
+
+  <div style="padding:24px;">
+    <form method="POST" action="/receipts/new">
+
+      <!-- SUPPLIER + WAREHOUSE ROW -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Supplier</label>
+          <input type="text" name="supplier" placeholder="e.g. Tata Steel Ltd."
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Destination Warehouse</label>
+          <select name="warehouse"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select warehouse</option>
+            <option>Main Warehouse</option>
+            <option>Warehouse 2</option>
+            <option>Production Floor</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PRODUCT + QTY ROW -->
+      <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Product</label>
+          <select name="product_id"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select product</option>
+            {% if products %}
+              {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }} ({{ product.sku }})</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Quantity</label>
+          <input type="number" name="qty" placeholder="0" min="1"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Expected Date</label>
+          <input type="date" name="date"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div style="margin-bottom:20px;">
+        <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Notes (optional)</label>
+        <textarea name="notes" placeholder="Any additional information..."
+          style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); resize:vertical; min-height:80px;"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="reset" class="btn-ghost-custom">Clear</button>
+        <button type="submit" name="action" value="draft" class="btn-ghost-custom">Save as Draft</button>
+        <button type="submit" name="action" value="validate" class="btn-primary-custom">Validate Receipt</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}
