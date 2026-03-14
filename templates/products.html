@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Products</div>
+    <div class="page-subtitle">Manage your inventory catalogue</div>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a href="/products/new" class="btn-primary-custom">+ Add Product</a>
+  </div>
+</div>
+
+<!-- SEARCH + FILTER BAR -->
+<div class="card-custom" style="margin-bottom:16px;">
+  <div style="padding:12px 20px; display:flex; gap:10px; align-items:center;">
+    <input
+      type="text"
+      placeholder="Search by name or SKU..."
+      style="flex:1; padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--charcoal);"
+    >
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Categories</option>
+      <option>Raw Materials</option>
+      <option>Finished Goods</option>
+      <option>Consumables</option>
+      <option>Spare Parts</option>
+    </select>
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Warehouses</option>
+      <option>Main Warehouse</option>
+      <option>Warehouse 2</option>
+      <option>Production Floor</option>
+    </select>
+  </div>
+</div>
+
+<!-- PRODUCTS TABLE -->
+<div class="card-custom">
+  <div class="card-head">
+    <div class="card-title">All Products</div>
+    <div style="font-size:11px; color:var(--gray);">{{ products|length if products else 0 }} items</div>
+  </div>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>SKU</th>
+        <th>Category</th>
+        <th>Unit</th>
+        <th>In Stock</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if products %}
+        {% for product in products %}
+        <tr>
+          <td style="font-weight:500;">{{ product.name }}</td>
+          <td style="color:var(--gray); font-size:11px; font-family:monospace;">{{ product.sku }}</td>
+          <td style="color:var(--gray);">{{ product.category }}</td>
+          <td style="color:var(--gray);">{{ product.unit }}</td>
+          <td style="font-weight:500;">{{ product.stock }}</td>
+          <td style="color:var(--gray);">{{ product.location }}</td>
+          <td>
+            {% if product.stock == 0 %}
+              <span class="pill pill-alert">Out of Stock</span>
+            {% elif product.stock < 10 %}
+              <span class="pill pill-waiting">Low Stock</span>
+            {% else %}
+              <span class="pill pill-ready">In Stock</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/products/{{ product.id }}/edit"
+               style="font-size:11px; color:var(--purple-mid); text-decoration:none;">
+              Edit
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--gray-light); padding:48px;">
+            No products yet — <a href="/products/new" style="color:var(--purple-mid); text-decoration:none;">add your first one</a>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ADD PRODUCT FORM -->
+<div class="card-custom" style="margin-top:16px;">
+  <div class="card-head">
+    <div class="card-title">Add New Product</div>
+  </div>
+
+  <div style="padding:24px;">
+    <form method="POST" action="/products/new">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Product Name</label>
+          <input type="text" name="name" placeholder="e.g. Steel Rods 6mm"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">SKU / Code</label>
+          <input type="text" name="sku" placeholder="e.g. STL-ROD-006"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Category</label>
+          <select name="category"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select category</option>
+            <option>Raw Materials</option>
+            <option>Finished Goods</option>
+            <option>Consumables</option>
+            <option>Spare Parts</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Unit of Measure</label>
+          <select name="unit"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select unit</option>
+            <option>kg</option>
+            <option>pcs</option>
+            <option>litres</option>
+            <option>metres</option>
+            <option>boxes</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Initial Stock</label>
+          <input type="number" name="initial_stock" placeholder="0" min="0"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Warehouse</label>
+          <select name="location"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select warehouse</option>
+            <option>Main Warehouse</option>
+            <option>Warehouse 2</option>
+            <option>Production Floor</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="reset" class="btn-ghost-custom">Clear</button>
+        <button type="submit" class="btn-primary-custom">Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

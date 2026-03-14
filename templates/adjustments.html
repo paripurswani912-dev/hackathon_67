@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Stock Adjustments</div>
+    <div class="page-subtitle">Fix mismatches between recorded and physical stock</div>
+  </div>
+  <a href="/adjustments/new" class="btn-primary-custom">+ New Adjustment</a>
+</div>
+
+<!-- FILTER BAR -->
+<div class="card-custom" style="margin-bottom:16px;">
+  <div style="padding:12px 20px; display:flex; gap:10px; align-items:center;">
+    <input
+      type="text"
+      placeholder="Search by reference or product..."
+      style="flex:1; padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--charcoal);"
+    >
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Types</option>
+      <option>Increase</option>
+      <option>Decrease</option>
+    </select>
+    <select style="padding:8px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:12px; font-family:'DM Sans',sans-serif; outline:none; background:var(--cream); color:var(--gray);">
+      <option value="">All Warehouses</option>
+      <option>Main Warehouse</option>
+      <option>Warehouse 2</option>
+      <option>Production Floor</option>
+    </select>
+  </div>
+</div>
+
+<!-- ADJUSTMENTS TABLE -->
+<div class="card-custom" style="margin-bottom:20px;">
+  <div class="card-head">
+    <div class="card-title">All Adjustments</div>
+    <div style="font-size:11px; color:var(--gray);">{{ adjustments|length if adjustments else 0 }} adjustments</div>
+  </div>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Product</th>
+        <th>Location</th>
+        <th>Recorded Qty</th>
+        <th>Counted Qty</th>
+        <th>Difference</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if adjustments %}
+        {% for adj in adjustments %}
+        <tr>
+          <td style="font-weight:500;">{{ adj.reference }}</td>
+          <td>{{ adj.product }}</td>
+          <td style="color:var(--gray);">{{ adj.location }}</td>
+          <td style="color:var(--gray);">{{ adj.recorded_qty }}</td>
+          <td style="font-weight:500;">{{ adj.counted_qty }}</td>
+          <td>
+            {% set diff = adj.counted_qty - adj.recorded_qty %}
+            {% if diff > 0 %}
+              <span style="color:var(--green); font-weight:500;">+{{ diff }}</span>
+            {% elif diff < 0 %}
+              <span style="color:var(--red); font-weight:500;">{{ diff }}</span>
+            {% else %}
+              <span style="color:var(--gray);">0</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--gray);">{{ adj.date }}</td>
+          <td>
+            {% if adj.status == 'Done' %}
+              <span class="pill pill-done">Done</span>
+            {% else %}
+              <span class="pill pill-draft">Draft</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; color:var(--gray-light); padding:48px;">
+            No adjustments yet — <a href="/adjustments/new" style="color:var(--purple-mid); text-decoration:none;">create your first one</a>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<!-- NEW ADJUSTMENT FORM -->
+<div class="card-custom">
+  <div class="card-head">
+    <div class="card-title">Create New Adjustment</div>
+  </div>
+
+  <div style="padding:24px;">
+    <form method="POST" action="/adjustments/new">
+
+      <!-- PRODUCT + LOCATION -->
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Product</label>
+          <select name="product_id"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select product</option>
+            {% if products %}
+              {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }} ({{ product.sku }})</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Location</label>
+          <select name="location"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="">Select location</option>
+            <option>Main Warehouse</option>
+            <option>Warehouse 2</option>
+            <option>Production Floor</option>
+            <option>Rack A</option>
+            <option>Rack B</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RECORDED + COUNTED QTY -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Recorded Qty</label>
+          <input type="number" name="recorded_qty" placeholder="System quantity" min="0" readonly
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--gray); background:var(--cream); cursor:not-allowed;">
+          <div style="font-size:10px; color:var(--gray-light); margin-top:4px;">Auto-filled from system</div>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Physical Count</label>
+          <input type="number" name="counted_qty" placeholder="Actual count" min="0"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+          <div style="font-size:10px; color:var(--gray-light); margin-top:4px;">Enter what you physically counted</div>
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Date</label>
+          <input type="date" name="date"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+      </div>
+
+      <!-- REASON -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Reason for Adjustment</label>
+        <select name="reason"
+          style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+          <option value="">Select reason</option>
+          <option>Damaged goods</option>
+          <option>Theft or loss</option>
+          <option>Counting error</option>
+          <option>Expired goods</option>
+          <option>Found items</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <!-- NOTES -->
+      <div style="margin-bottom:20px;">
+        <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Notes (optional)</label>
+        <textarea name="notes" placeholder="Additional details about this adjustment..."
+          style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); resize:vertical; min-height:80px;"></textarea>
+      </div>
+
+      <!-- INFO BOX -->
+      <div style="background:var(--amber-light); border-radius:8px; padding:14px 18px; margin-bottom:20px;">
+        <div style="font-size:11px; color:var(--amber); line-height:1.7;">
+          <span style="font-weight:500;">Warning:</span> Validating an adjustment will permanently update the stock count and log the change in Move History. This action cannot be undone.
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="reset" class="btn-ghost-custom">Clear</button>
+        <button type="submit" name="action" value="draft" class="btn-ghost-custom">Save as Draft</button>
+        <button type="submit" name="action" value="validate" class="btn-primary-custom">Validate Adjustment</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

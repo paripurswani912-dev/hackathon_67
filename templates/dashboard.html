@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">Welcome back — here's your inventory snapshot</div>
+  </div>
+  <div style="display:flex; gap:8px;">
+    <a href="/receipts/new" class="btn-ghost-custom">Export</a>
+    <a href="/receipts/new" class="btn-primary-custom">+ New Receipt</a>
+  </div>
+</div>
+
+<!-- KPI CARDS -->
+<div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px;">
+
+  <div class="card-custom" style="padding:16px 18px; border-top:2px solid var(--purple-mid);">
+    <div style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:8px;">Total Products</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:600; color:var(--purple-dark); line-height:1;">{{ total_products or '—' }}</div>
+    <div style="font-size:10px; color:var(--gray-light); margin-top:5px;">across all warehouses</div>
+  </div>
+
+  <div class="card-custom" style="padding:16px 18px; border-top:2px solid var(--amber);">
+    <div style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:8px;">Low Stock</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:600; color:var(--purple-dark); line-height:1;">{{ low_stock or '—' }}</div>
+    <span class="pill pill-waiting" style="margin-top:6px; display:inline-block;">Needs reorder</span>
+  </div>
+
+  <div class="card-custom" style="padding:16px 18px; border-top:2px solid var(--red);">
+    <div style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:8px;">Out of Stock</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:600; color:var(--purple-dark); line-height:1;">{{ out_of_stock or '—' }}</div>
+    <span class="pill pill-alert" style="margin-top:6px; display:inline-block;">Urgent</span>
+  </div>
+
+  <div class="card-custom" style="padding:16px 18px; border-top:2px solid var(--cream3);">
+    <div style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:8px;">Pending Receipts</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:600; color:var(--purple-dark); line-height:1;">{{ pending_receipts or '—' }}</div>
+    <div style="font-size:10px; color:var(--gray-light); margin-top:5px;">awaiting validation</div>
+  </div>
+
+  <div class="card-custom" style="padding:16px 18px; border-top:2px solid var(--green);">
+    <div style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray); margin-bottom:8px;">Pending Deliveries</div>
+    <div style="font-family:'Cormorant Garamond',serif; font-size:30px; font-weight:600; color:var(--purple-dark); line-height:1;">{{ pending_deliveries or '—' }}</div>
+    <span class="pill pill-ready" style="margin-top:6px; display:inline-block;">On schedule</span>
+  </div>
+
+</div>
+
+<!-- MAIN GRID -->
+<div style="display:grid; grid-template-columns:1fr 300px; gap:16px;">
+
+  <!-- LEFT: OPERATIONS TABLE -->
+  <div class="card-custom">
+    <div class="card-head">
+      <div class="card-title">Recent Operations</div>
+      <a href="/history" style="font-size:11px; color:var(--purple-mid); text-decoration:none;">View all →</a>
+    </div>
+
+    <!-- FILTER CHIPS -->
+    <div style="padding:10px 20px; border-bottom:0.5px solid var(--cream2); display:flex; gap:6px;">
+      <span class="pill pill-done" style="cursor:pointer;">All</span>
+      <span class="pill pill-draft" style="cursor:pointer;">Receipts</span>
+      <span class="pill pill-draft" style="cursor:pointer;">Delivery</span>
+      <span class="pill pill-draft" style="cursor:pointer;">Transfers</span>
+      <span class="pill pill-draft" style="cursor:pointer;">Adjustments</span>
+    </div>
+
+    <!-- TABLE -->
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Type</th>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if recent_operations %}
+          {% for op in recent_operations %}
+          <tr>
+            <td>{{ op.reference }}</td>
+            <td style="color:var(--gray);">{{ op.type }}</td>
+            <td>{{ op.product }}</td>
+            <td>{{ op.qty }}</td>
+            <td>{{ op.date }}</td>
+            <td>
+              {% if op.status == 'Ready' %}
+                <span class="pill pill-ready">Ready</span>
+              {% elif op.status == 'Waiting' %}
+                <span class="pill pill-waiting">Waiting</span>
+              {% elif op.status == 'Done' %}
+                <span class="pill pill-done">Done</span>
+              {% else %}
+                <span class="pill pill-draft">Draft</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" style="text-align:center; color:var(--gray-light); padding:32px;">
+              No operations yet
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <!-- LOW STOCK ALERTS -->
+    <div class="card-custom">
+      <div class="card-head">
+        <div class="card-title">Low Stock Alerts</div>
+        <a href="/products" style="font-size:11px; color:var(--purple-mid); text-decoration:none;">Reorder →</a>
+      </div>
+      {% if low_stock_items %}
+        {% for item in low_stock_items %}
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:0.5px solid var(--cream2);">
+          <div>
+            <div style="font-size:12px; color:var(--charcoal);">{{ item.name }}</div>
+            <div style="font-size:10px; color:var(--gray-light); margin-top:2px;">{{ item.location }}</div>
+          </div>
+          <div style="font-size:11px; color:var(--red); font-weight:500;">{{ item.qty }} left</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="padding:24px 16px; text-align:center; font-size:12px; color:var(--gray-light);">
+          All stock levels healthy
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="card-custom">
+      <div class="card-head">
+        <div class="card-title">Recent Activity</div>
+      </div>
+      {% if recent_activity %}
+        {% for activity in recent_activity %}
+        <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 16px; border-bottom:0.5px solid var(--cream2);">
+          <div style="width:7px; height:7px; border-radius:50%; background:var(--purple-soft); margin-top:4px; flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:11px; color:var(--charcoal); line-height:1.5;">{{ activity.text }}</div>
+            <div style="font-size:10px; color:var(--gray-light); margin-top:2px;">{{ activity.time }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="padding:24px 16px; text-align:center; font-size:12px; color:var(--gray-light);">
+          No recent activity
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
