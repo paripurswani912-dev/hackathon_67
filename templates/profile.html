@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width:600px; margin:0 auto;">
+
+  <!-- PAGE HEADER -->
+  <div style="margin-bottom:24px;">
+    <div class="page-title">My Profile</div>
+    <div class="page-subtitle">Your account details</div>
+  </div>
+
+  <!-- PROFILE CARD -->
+  <div class="card-custom">
+    <div class="card-head">
+      <div class="card-title">Account Information</div>
+    </div>
+    <div style="padding:28px; display:flex; align-items:center; gap:20px; border-bottom:0.5px solid var(--cream2);">
+      <div style="width:60px; height:60px; border-radius:50%; background:var(--purple-soft); display:flex; align-items:center; justify-content:center; font-family:'DM Sans',sans-serif; font-size:20px; font-weight:500; color:var(--purple-dark); flex-shrink:0;">
+        {{ current_user.username[:2].upper() }}
+      </div>
+      <div>
+        <div style="font-size:18px; font-weight:500; color:var(--purple-dark); font-family:'Cormorant Garamond',serif;">{{ current_user.username }}</div>
+        <div style="font-size:12px; color:var(--gray); margin-top:3px;">Inventory Manager</div>
+      </div>
+    </div>
+    <div style="padding:20px 28px;">
+      <table style="width:100%; font-size:13px;">
+        <tr>
+          <td style="color:var(--gray); padding:8px 0; width:140px;">Username</td>
+          <td style="color:var(--charcoal); font-weight:500;">{{ current_user.username }}</td>
+        </tr>
+        <tr>
+          <td style="color:var(--gray); padding:8px 0;">Email</td>
+          <td style="color:var(--charcoal); font-weight:500;">{{ current_user.email }}</td>
+        </tr>
+        <tr>
+          <td style="color:var(--gray); padding:8px 0;">Role</td>
+          <td style="color:var(--charcoal); font-weight:500;">Inventory Manager</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOGOUT -->
+  <div style="margin-top:16px; display:flex; justify-content:flex-end;">
+    <a href="/logout" style="padding:8px 20px; background:var(--red-light); color:var(--red); border:0.5px solid var(--red); border-radius:6px; font-size:12px; text-decoration:none; font-family:'DM Sans',sans-serif;">Logout</a>
+  </div>
+
+</div>
+
+{% endblock %}

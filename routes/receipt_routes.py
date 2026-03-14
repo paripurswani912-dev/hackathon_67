@@ -34,7 +34,18 @@ def list_receipts():
         receipts=receipt_list,
         products=products
     )
-
+@receipt_bp.route("/receipts/new", methods=["GET"])
+def new_receipt_page():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    products = Product.query.all()
+    return render_template("receipts.html",
+        active_page="receipts",
+        page_title="Receipts",
+        current_user=type("User", (), {"username": session.get("username", "U")})(),
+        receipts=[],
+        products=products
+    )
 @receipt_bp.route("/receipts/new", methods=["POST"])
 def create_receipt():
     if "user_id" not in session:

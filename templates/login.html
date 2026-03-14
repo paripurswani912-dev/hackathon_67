@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoreInventory — Login</title>
+  <title>Login | koshex</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 38'><polygon points='19,4 33,11 19,18 5,11' fill='%23AFA9EC' opacity='0.9' stroke='%2326215C' stroke-width='1.2'/><polygon points='5,11 19,18 19,34 5,27' fill='%2326215C' stroke='%2326215C' stroke-width='1.2'/><polygon points='33,11 19,18 19,34 33,27' fill='%233C3489' stroke='%2326215C' stroke-width='1.2'/></svg>">
 
   <style>
     :root {
@@ -26,12 +27,16 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    html, body {
+      height: 100%;
       font-family: 'DM Sans', sans-serif;
       background: var(--cream);
-      min-height: 100vh;
+    }
+
+    body {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
     }
 
     /* ── LEFT PANEL ── */
@@ -43,9 +48,9 @@
       padding: 48px;
       position: relative;
       overflow: hidden;
+      min-height: 100vh;
     }
 
-    /* decorative circles */
     .left-panel::before {
       content: '';
       position: absolute;
@@ -69,14 +74,11 @@
     }
 
     .left-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 600;
-      color: white;
-      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1;
     }
-
-    .left-logo span { color: var(--purple-soft); }
 
     .left-content { z-index: 1; }
 
@@ -116,6 +118,7 @@
       align-items: center;
       justify-content: center;
       padding: 48px;
+      background: var(--cream);
     }
 
     .form-box {
@@ -138,10 +141,8 @@
       margin-bottom: 32px;
     }
 
-    /* TABS */
     .tabs {
       display: flex;
-      gap: 0;
       margin-bottom: 28px;
       border-bottom: 1px solid var(--cream2);
     }
@@ -163,10 +164,7 @@
       border-bottom-color: var(--purple-mid);
     }
 
-    /* FORM FIELDS */
-    .field {
-      margin-bottom: 16px;
-    }
+    .field { margin-bottom: 16px; }
 
     .field label {
       display: block;
@@ -191,13 +189,9 @@
       transition: border-color 0.15s;
     }
 
-    .field input:focus {
-      border-color: var(--purple-soft);
-    }
-
+    .field input:focus { border-color: var(--purple-soft); }
     .field input::placeholder { color: var(--cream3); }
 
-    /* FORGOT PASSWORD */
     .forgot {
       text-align: right;
       margin-top: -8px;
@@ -208,12 +202,10 @@
       font-size: 11px;
       color: var(--gray);
       text-decoration: none;
-      transition: color 0.15s;
     }
 
     .forgot a:hover { color: var(--purple-mid); }
 
-    /* SUBMIT BUTTON */
     .btn-submit {
       width: 100%;
       padding: 11px;
@@ -225,34 +217,11 @@
       font-weight: 500;
       font-family: 'DM Sans', sans-serif;
       cursor: pointer;
-      letter-spacing: 0.02em;
       transition: background 0.15s;
     }
 
     .btn-submit:hover { background: var(--purple-dark); }
 
-    /* DIVIDER */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 0.5px;
-      background: var(--cream2);
-    }
-
-    .divider span {
-      font-size: 11px;
-      color: var(--gray-light);
-    }
-
-    /* FLASH MESSAGES */
     .flash-error {
       background: var(--red-light);
       color: var(--red);
@@ -273,7 +242,6 @@
       margin-bottom: 16px;
     }
 
-    /* TOGGLE FORMS */
     .form-section { display: none; }
     .form-section.active { display: block; }
   </style>
@@ -283,17 +251,17 @@
 
   <!-- LEFT PANEL -->
   <div class="left-panel">
-    <div class="left-logo" style="display:flex; align-items:center; gap:10px;">
-  <svg width="28" height="28" viewBox="0 0 38 38" fill="none">
-    <polygon points="19,4 33,11 19,18 5,11" fill="#AFA9EC" opacity="0.25" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
-    <polygon points="5,11 19,18 19,34 5,27" fill="#AFA9EC" opacity="0.1" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
-    <polygon points="33,11 19,18 19,34 33,27" fill="#AFA9EC" opacity="0.18" stroke="#AFA9EC" stroke-width="1.2" stroke-linejoin="round"/>
-  </svg>
-  <div>
-    <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:500; letter-spacing:-0.02em; color:white; line-height:1;">kosh<span style="color:#AFA9EC;">ex</span></div>
-    <div style="font-family:'DM Sans',sans-serif; font-size:8px; font-weight:300; letter-spacing:0.18em; text-transform:uppercase; color:rgba(175,169,236,0.5); margin-top:3px;">inventory intelligence</div>
-  </div>
-</div>
+    <div class="left-logo">
+      <svg width="28" height="28" viewBox="0 0 38 38" fill="none">
+        <polygon points="19,4 33,11 19,18 5,11" fill="#3C3489" stroke="#4a4080" stroke-width="0.8" stroke-linejoin="round"/>
+        <polygon points="5,11 19,18 19,34 5,27" fill="#26215C" stroke="#2e2870" stroke-width="0.8" stroke-linejoin="round"/>
+        <polygon points="33,11 19,18 19,34 33,27" fill="#534AB7" stroke="#4a4080" stroke-width="0.8" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:17px; letter-spacing:0.01em; line-height:1;"><span style="font-weight:600; color:white;">kosh</span><span style="font-weight:300; color:rgba(255,255,255,0.75);">ex</span></div>
+        <div style="font-family:'DM Sans',sans-serif; font-size:7px; font-weight:300; letter-spacing:0.2em; text-transform:uppercase; color:rgba(175,169,236,0.55); margin-top:3px;">inventory intelligence</div>
+      </div>
+    </div>
 
     <div class="left-content">
       <div class="left-tagline">
@@ -304,7 +272,7 @@
       </div>
     </div>
 
-    <div class="left-footer">COREINVENTORY &nbsp;·&nbsp; HACKATHON 2026</div>
+    <div class="left-footer">KOSHEX &nbsp;·&nbsp; HACKATHON 2026</div>
   </div>
 
   <!-- RIGHT PANEL -->
@@ -314,20 +282,17 @@
       <div class="form-heading">Welcome back</div>
       <div class="form-subheading">Sign in to your inventory workspace</div>
 
-      <!-- FLASH MESSAGES -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
           <div class="flash-{{ category }}">{{ message }}</div>
         {% endfor %}
       {% endwith %}
 
-      <!-- TABS -->
       <div class="tabs">
         <div class="tab active" onclick="switchTab('login', this)">Sign In</div>
         <div class="tab" onclick="switchTab('signup', this)">Sign Up</div>
       </div>
 
-      <!-- LOGIN FORM -->
       <div id="login-form" class="form-section active">
         <form method="POST" action="/login">
           <div class="field">
@@ -345,7 +310,6 @@
         </form>
       </div>
 
-      <!-- SIGNUP FORM -->
       <div id="signup-form" class="form-section">
         <form method="POST" action="/signup">
           <div class="field">

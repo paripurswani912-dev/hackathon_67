@@ -43,7 +43,28 @@ app.register_blueprint(move_history_bp)
 def home():
     from flask import redirect
     return redirect("/login")
-
+@app.route("/profile")
+def profile():
+    from flask import render_template, session, redirect, url_for
+    from models.user import User
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    user = User.query.get(session["user_id"])
+    return render_template("profile.html",
+        active_page="profile",
+        page_title="My Profile",
+        current_user=user
+    )
+@app.route("/settings")
+def settings():
+    from flask import render_template, session, redirect, url_for
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    return render_template("settings.html",
+        active_page="settings",
+        page_title="Settings",
+        current_user=type("User", (), {"username": session.get("username", "U")})()
+    )
 # Create tables
 with app.app_context():
     db.create_all()

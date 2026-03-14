@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+  <div>
+    <div class="page-title">Settings</div>
+    <div class="page-subtitle">Manage your workspace preferences</div>
+  </div>
+</div>
+
+<!-- WAREHOUSE SETTINGS -->
+<div class="card-custom" style="margin-bottom:16px;">
+  <div class="card-head">
+    <div class="card-title">Warehouse Locations</div>
+  </div>
+  <div style="padding:24px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+      <div style="padding:16px; background:var(--cream); border-radius:8px; border:0.5px solid var(--cream2);">
+        <div style="font-size:12px; font-weight:500; color:var(--purple-dark); margin-bottom:4px;">Main Warehouse</div>
+        <div style="font-size:11px; color:var(--gray);">Primary storage location</div>
+      </div>
+      <div style="padding:16px; background:var(--cream); border-radius:8px; border:0.5px solid var(--cream2);">
+        <div style="font-size:12px; font-weight:500; color:var(--purple-dark); margin-bottom:4px;">Warehouse 2</div>
+        <div style="font-size:11px; color:var(--gray);">Secondary storage location</div>
+      </div>
+      <div style="padding:16px; background:var(--cream); border-radius:8px; border:0.5px solid var(--cream2);">
+        <div style="font-size:12px; font-weight:500; color:var(--purple-dark); margin-bottom:4px;">Production Floor</div>
+        <div style="font-size:11px; color:var(--gray);">Active production area</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP INFO -->
+<div class="card-custom">
+  <div class="card-head">
+    <div class="card-title">About koshex</div>
+  </div>
+  <div style="padding:24px; display:flex; align-items:center; gap:16px;">
+    <svg width="44" height="44" viewBox="0 0 38 38" fill="none">
+  <polygon points="19,4 33,11 19,18 5,11" fill="#3C3489" stroke="#4a4080" stroke-width="0.8" stroke-linejoin="round"/>
+  <polygon points="5,11 19,18 19,34 5,27" fill="#26215C" stroke="#2e2870" stroke-width="0.8" stroke-linejoin="round"/>
+  <polygon points="33,11 19,18 19,34 33,27" fill="#534AB7" stroke="#4a4080" stroke-width="0.8" stroke-linejoin="round"/>
+</svg>
+<div>
+  <div style="font-family:'DM Sans',sans-serif; font-size:20px; letter-spacing:0.01em;"><span style="font-weight:600; color:#26215C;">kosh</span><span style="font-weight:300; color:#888780;">ex</span></div>
+  <div style="font-size:10px; color:#B4B2A9; letter-spacing:0.2em; text-transform:uppercase; margin-top:3px;">inventory intelligence</div>
+  <div style="font-size:11px; color:var(--gray-light); margin-top:6px;">Version 1.0 - odoo x Hackathon 2026</div>
+</div>
+  </div>
+</div>
+
+{% endblock %}

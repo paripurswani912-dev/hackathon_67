@@ -8,7 +8,7 @@
     <div class="page-title">Move History</div>
     <div class="page-subtitle">Complete log of every stock movement</div>
   </div>
-  <a href="/history/export" class="btn-ghost-custom">Export Log</a>
+  <span class="btn-ghost-custom" style="cursor:pointer;" onclick="exportLog()">Export Log</span>
 </div>
 
 <!-- FILTER BAR -->
@@ -138,5 +138,37 @@
     </tbody>
   </table>
 </div>
+<script>
+function exportLog() {
+  const table = document.querySelector('.table-custom');
+  if (!table) { alert('No data to export.'); return; }
 
+  let csv = [];
+  const headers = table.querySelectorAll('th');
+  let headerRow = [];
+  headers.forEach(h => headerRow.push('"' + h.innerText.trim() + '"'));
+  csv.push(headerRow.join(','));
+
+  const rows = table.querySelectorAll('tbody tr');
+  if (rows.length === 0) { alert('No history to export yet.'); return; }
+
+  rows.forEach(row => {
+    let rowData = [];
+    row.querySelectorAll('td').forEach(cell => {
+      rowData.push('"' + cell.innerText.trim().replace(/"/g, '""') + '"');
+    });
+    csv.push(rowData.join(','));
+  });
+
+  const csvContent = csv.join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'koshex_move_history.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>
 {% endblock %}
