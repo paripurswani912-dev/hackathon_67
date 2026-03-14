@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV 'C:\Users\Pari\Desktop\hackathon\venv'
+set -gx VIRTUAL_ENV 'C:\Users\SUKRITI CHADHA\Downloads\hackathon_67\venv'
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"Scripts $PATH
