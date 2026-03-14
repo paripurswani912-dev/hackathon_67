@@ -55,6 +55,19 @@ def profile():
         page_title="My Profile",
         current_user=user
     )
+@app.route("/profile/edit", methods=["POST"])
+def edit_profile():
+    from flask import request, render_template, session, redirect, url_for
+    from models.user import User
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    user = User.query.get(session["user_id"])
+    user.username = request.form.get("username")
+    user.email = request.form.get("email")
+    user.role = request.form.get("role")
+    db.session.commit()
+    session["username"] = user.username
+    return redirect("/profile")
 @app.route("/settings")
 def settings():
     from flask import render_template, session, redirect, url_for

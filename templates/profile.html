@@ -4,27 +4,37 @@
 
 <div style="max-width:600px; margin:0 auto;">
 
-  <!-- PAGE HEADER -->
   <div style="margin-bottom:24px;">
     <div class="page-title">My Profile</div>
     <div class="page-subtitle">Your account details</div>
   </div>
 
   <!-- PROFILE CARD -->
-  <div class="card-custom">
+  <div class="card-custom" style="margin-bottom:16px;">
     <div class="card-head">
       <div class="card-title">Account Information</div>
+      <span id="edit-toggle" onclick="toggleEdit()" style="font-size:11px; color:var(--purple-mid); cursor:pointer;">Edit Profile</span>
     </div>
+
+    <!-- AVATAR + NAME -->
     <div style="padding:28px; display:flex; align-items:center; gap:20px; border-bottom:0.5px solid var(--cream2);">
-      <div style="width:60px; height:60px; border-radius:50%; background:var(--purple-soft); display:flex; align-items:center; justify-content:center; font-family:'DM Sans',sans-serif; font-size:20px; font-weight:500; color:var(--purple-dark); flex-shrink:0;">
+      <div id="avatar-circle" style="width:60px; height:60px; border-radius:50%; background:var(--purple-soft); display:flex; align-items:center; justify-content:center; font-family:'DM Sans',sans-serif; font-size:20px; font-weight:500; color:var(--purple-dark); flex-shrink:0; cursor:pointer; position:relative;" onclick="document.getElementById('avatar-input').click()">
         {{ current_user.username[:2].upper() }}
+        <div style="position:absolute; bottom:0; right:0; width:18px; height:18px; background:var(--purple-mid); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M1 7L3.5 4.5L6 7M5 2L8 5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
       </div>
+      <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="previewAvatar(event)">
       <div>
         <div style="font-size:18px; font-weight:500; color:var(--purple-dark); font-family:'Cormorant Garamond',serif;">{{ current_user.username }}</div>
-        <div style="font-size:12px; color:var(--gray); margin-top:3px;">Inventory Manager</div>
+        <div style="font-size:12px; color:var(--gray); margin-top:3px;">{{ current_user.role }}</div>
       </div>
     </div>
-    <div style="padding:20px 28px;">
+
+    <!-- VIEW MODE -->
+    <div id="view-mode" style="padding:20px 28px;">
       <table style="width:100%; font-size:13px;">
         <tr>
           <td style="color:var(--gray); padding:8px 0; width:140px;">Username</td>
@@ -36,17 +46,76 @@
         </tr>
         <tr>
           <td style="color:var(--gray); padding:8px 0;">Role</td>
-          <td style="color:var(--charcoal); font-weight:500;">Inventory Manager</td>
+          <td style="color:var(--charcoal); font-weight:500;">{{ current_user.role }}</td>
         </tr>
       </table>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div id="edit-mode" style="display:none; padding:20px 28px;">
+      <form method="POST" action="/profile/edit">
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Username</label>
+          <input type="text" name="username" value="{{ current_user.username }}"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Email</label>
+          <input type="email" name="email" value="{{ current_user.email }}"
+            style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal);">
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray); margin-bottom:6px;">Role</label>
+          <select name="role" style="width:100%; padding:9px 14px; border:0.5px solid var(--cream3); border-radius:6px; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; color:var(--charcoal); background:white;">
+            <option value="Inventory Manager" {% if current_user.role == 'Inventory Manager' %}selected{% endif %}>Inventory Manager</option>
+            <option value="Warehouse Staff" {% if current_user.role == 'Warehouse Staff' %}selected{% endif %}>Warehouse Staff</option>
+            <option value="Admin" {% if current_user.role == 'Admin' %}selected{% endif %}>Admin</option>
+          </select>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" onclick="toggleEdit()" class="btn-ghost-custom">Cancel</button>
+          <button type="submit" class="btn-primary-custom">Save Changes</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <!-- LOGOUT -->
-  <div style="margin-top:16px; display:flex; justify-content:flex-end;">
+  <div style="display:flex; justify-content:flex-end;">
     <a href="/logout" style="padding:8px 20px; background:var(--red-light); color:var(--red); border:0.5px solid var(--red); border-radius:6px; font-size:12px; text-decoration:none; font-family:'DM Sans',sans-serif;">Logout</a>
   </div>
 
 </div>
+
+<script>
+function toggleEdit() {
+  const view = document.getElementById('view-mode');
+  const edit = document.getElementById('edit-mode');
+  const btn = document.getElementById('edit-toggle');
+  if (edit.style.display === 'none') {
+    view.style.display = 'none';
+    edit.style.display = 'block';
+    btn.textContent = 'Cancel';
+  } else {
+    view.style.display = 'block';
+    edit.style.display = 'none';
+    btn.textContent = 'Edit Profile';
+  }
+}
+
+function previewAvatar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const circle = document.getElementById('avatar-circle');
+    circle.style.backgroundImage = `url(${e.target.result})`;
+    circle.style.backgroundSize = 'cover';
+    circle.style.backgroundPosition = 'center';
+    circle.textContent = '';
+  };
+  reader.readAsDataURL(file);
+}
+</script>
 
 {% endblock %}
